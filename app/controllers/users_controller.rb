@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :require_user_logged_in, only: [:index, :show]
+  
   def index
     @pagy, @users = pagy(User.order(id: :desc), items: 25)
   end
@@ -23,8 +25,15 @@ class UsersController < ApplicationController
     end
   end
   
+  def destroy
+    session[:user_id] = nil
+    flash[:success] = 'ログアウトしました。'
+    redirect_to root_url
+  end
+  
   private
   
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  end
 end
